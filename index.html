@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Caja Misteriosa de Tex Fashion</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,700;0,900;1,900&family=Titan+One&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: radial-gradient(circle at center, #002b7f 0%, #061024 70%, #020611 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            font-family: 'Montserrat', sans-serif;
+            overflow-x: hidden;
+        }
+
+        header { text-align: center; margin-bottom: 20px; }
+        .brand-header { display: flex; align-items: center; justify-content: center; gap: 15px; flex-wrap: wrap; }
+        .brand-logo { max-height: 70px; width: auto; object-fit: contain; filter: drop-shadow(0px 4px 8px rgba(0, 0, 0, 0.6)); }
+        .brand-name {
+            font-family: 'Montserrat', sans-serif;
+            font-size: clamp(2.3rem, 5.5vw, 4.5rem);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            background: linear-gradient(180deg, #ffffff 40%, #d4e0ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0px 4px 10px rgba(0, 0, 0, 0.8));
+            line-height: 1.1;
+        }
+
+        .game-title {
+            font-family: 'Titan One', cursive;
+            font-size: clamp(1.8rem, 4.5vw, 3.2rem);
+            color: #ffb700;
+            text-shadow: 3px 3px 0px #000000, 0px 0px 25px rgba(255, 183, 0, 0.8);
+            margin-top: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transform: rotate(-1deg);
+        }
+
+        .instructions-card {
+            background: rgba(10, 15, 29, 0.9);
+            border: 2px solid #ffb700;
+            backdrop-filter: blur(12px);
+            border-radius: 20px;
+            padding: 25px 20px;
+            max-width: 580px;
+            width: 100%;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8), 0 0 15px rgba(255, 183, 0, 0.2);
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .btn-comprobante {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: #ffffff; border: 2px solid #ffffff; padding: 12px 20px;
+            font-size: 0.95rem; font-weight: 900; border-radius: 25px; cursor: pointer;
+            width: 100%; text-transform: uppercase; box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+            margin-top: 10px; transition: transform 0.2s;
+        }
+
+        .pin-input {
+            width: 100%; max-width: 320px; background: #061024; border: 2px solid #2a4178;
+            border-radius: 12px; padding: 12px; color: #ffb700; font-family: 'Montserrat', sans-serif;
+            font-size: 1.1rem; font-weight: 900; text-align: center; letter-spacing: 2px;
+            outline: none; margin-top: 10px;
+        }
+
+        .btn-next {
+            background: linear-gradient(135deg, #ffb700, #ff8c00); color: #000000;
+            border: 2px solid #ffffff; padding: 14px 35px; font-size: 1.1rem;
+            font-weight: 900; border-radius: 50px; cursor: pointer; display: inline-flex;
+            align-items: center; justify-content: center; gap: 10px; box-shadow: 0 8px 20px rgba(255, 183, 0, 0.4);
+            text-transform: uppercase; width: 100%; margin-top: 10px;
+        }
+
+        .error-msg { color: #ff4d4d; font-size: 0.85rem; text-align: center; margin-top: 8px; display: none; font-weight: 700; }
+
+        .game-section { display: none; width: 100%; max-width: 700px; flex-direction: column; align-items: center; }
+        
+        .grid-container { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 15px; 
+            width: 100%; 
+            margin-top: 15px; 
+        }
+
+        .box {
+            background: linear-gradient(145deg, #001e59, #001238); border: 3px solid #ffb700;
+            border-radius: 20px; height: 130px; display: flex; justify-content: center;
+            align-items: center; font-size: 3.8rem; cursor: pointer; user-select: none;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.6); transition: transform 0.2s;
+        }
+        .box:hover { transform: scale(1.05); }
+
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(2, 6, 17, 0.92); justify-content: center; align-items: center;
+            z-index: 1000; backdrop-filter: blur(8px); padding: 15px;
+        }
+
+        .modal-content {
+            background: #ffffff; color: #061024; padding: 30px 20px; border-radius: 25px;
+            border: 4px solid #ffb700; text-align: center; max-width: 580px; width: 100%;
+            position: relative; overflow: hidden;
+            box-shadow: 0 0 30px rgba(255, 183, 0, 0.5);
+        }
+
+        .form-group { text-align: left; margin-bottom: 12px; }
+        .form-group label { display: block; font-size: 0.8rem; font-weight: 800; color: #002b7f; margin-bottom: 4px; }
+        .form-input { width: 100%; padding: 10px; border: 2px solid #002b7f; border-radius: 8px; outline: none; }
+        .referrals-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+
+        .btn-modal {
+            background: linear-gradient(135deg, #002b7f, #001238); color: #ffffff; border: 2px solid #ffb700;
+            padding: 12px 28px; font-size: 0.95rem; font-weight: 900; border-radius: 30px; cursor: pointer; margin: 5px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: transform 0.2s;
+            position: relative; z-index: 2; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            text-decoration: none;
+        }
+        .btn-modal:hover { transform: scale(1.05); }
+
+        /* RECUADRO ANIMADO EXCLUSIVO PARA EL PREMIO */
+        .animated-prize-box {
+            background: linear-gradient(-45deg, #002b7f, #1a4ba0, #ffb700, #001238);
+            background-size: 300% 300%;
+            animation: gradientBG 4s ease infinite, pulseBorder 1.5s infinite alternate;
+            border: 3px solid #ffb700;
+            border-radius: 20px;
+            padding: 20px 15px;
+            margin: 20px 0;
+            position: relative;
+            z-index: 2;
+            box-shadow: 0 10px 25px rgba(0, 43, 127, 0.4);
+        }
+
+        .animated-prize-title {
+            color: #ffffff;
+            font-size: clamp(1.3rem, 4vw, 1.8rem);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.8), 0 0 15px rgba(255, 183, 0, 0.8);
+            animation: bounceText 1.2s infinite alternate ease-in-out;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes pulseBorder {
+            0% { box-shadow: 0 0 10px rgba(255, 183, 0, 0.4); transform: scale(1); }
+            100% { box-shadow: 0 0 25px rgba(255, 183, 0, 0.9); transform: scale(1.02); }
+        }
+
+        @keyframes bounceText {
+            0% { transform: scale(0.98); }
+            100% { transform: scale(1.03); }
+        }
+
+        .social-claim-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 15px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .btn-social-claim {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 14px 20px;
+            border-radius: 30px;
+            color: #ffffff;
+            font-weight: 900;
+            font-size: 0.95rem;
+            text-decoration: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+            text-transform: uppercase;
+        }
+        .btn-social-claim:hover { transform: scale(1.03); }
+
+        .btn-social-claim.instagram { background: linear-gradient(135deg, #833ab4, #fd1d1d, #fcb045); }
+        .btn-social-claim.whatsapp { background: linear-gradient(135deg, #25d366, #128c7e); }
+        .btn-social-claim.tiktok { background: linear-gradient(135deg, #000000, #25f4ee, #fe2c55); }
+
+        .result-container {
+            position: relative;
+            z-index: 1;
+            animation: popup 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes popup {
+            0% { transform: scale(0.3); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .sunburst-bg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 350px;
+            height: 350px;
+            transform: translate(-50%, -50%);
+            background: repeating-conic-gradient(
+                from 0deg,
+                rgba(255, 183, 0, 0.25) 0deg 15deg,
+                transparent 15deg 30deg
+            );
+            border-radius: 50%;
+            animation: rotate-sunburst 12s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes rotate-sunburst {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .prize-images-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 2;
+        }
+
+        .prize-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            perspective: 1000px;
+            animation: victory-pop 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+        }
+
+        .prize-item:nth-child(1) { animation-delay: 0.15s; }
+        .prize-item:nth-child(2) { animation-delay: 0.35s; }
+        .prize-item:nth-child(3) { animation-delay: 0.55s; }
+
+        @keyframes victory-pop {
+            0% { transform: scale(0) rotateY(-180deg) translateY(50px); opacity: 0; }
+            70% { transform: scale(1.15) rotateY(10deg) translateY(-10px); }
+            100% { transform: scale(1) rotateY(0deg) translateY(0); opacity: 1; }
+        }
+
+        .prize-img {
+            max-width: 140px;
+            width: 100%;
+            height: 130px;
+            object-fit: contain;
+            background: #ffffff;
+            border: 3px solid #ffb700;
+            border-radius: 20px;
+            padding: 10px;
+            box-shadow: 0 12px 25px rgba(255, 183, 0, 0.4);
+            animation: pulse-glow-intense 1.8s infinite alternate ease-in-out;
+        }
+
+        @keyframes pulse-glow-intense {
+            0% { box-shadow: 0 0 15px rgba(255, 183, 0, 0.5); transform: scale(1); }
+            100% { box-shadow: 0 0 35px rgba(255, 183, 0, 1); transform: scale(1.08); }
+        }
+
+        .floating-emoji {
+            font-size: 2.5rem;
+            display: inline-block;
+            animation: bounce-victory 0.8s infinite alternate ease-in-out;
+            margin: 0 5px;
+        }
+
+        @keyframes bounce-victory {
+            0% { transform: translateY(0) scale(1); }
+            100% { transform: translateY(-12px) scale(1.2); }
+        }
+
+        .title-anim {
+            font-size: 1.6rem;
+            font-weight: 900;
+            color: #002b7f;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .prize-text {
+            font-size: 1.2rem; 
+            font-weight: 900; 
+            color: #002b7f; 
+            margin-top: 10px;
+            position: relative;
+            z-index: 2;
+        }
+
+        @media (max-width: 600px) {
+            .grid-container { grid-template-columns: repeat(2, 1fr); }
+            .box { height: 110px; font-size: 3.2rem; }
+            .prize-img { max-width: 105px; height: 100px; }
+            .sunburst-bg { width: 260px; height: 260px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand-header">
+            <img src="imagenes/logo.png" alt="Logo Tex Fashion" class="brand-logo">
+            <h1 class="brand-name">TEX FASHION</h1>
+        </div>
+        <h2 class="game-title">📦 LA CAJA MISTERIOSA 📦</h2>
+    </header>
+
+    <!-- INSTRUCCIONES Y VERIFICACIÓN -->
+    <div class="instructions-card" id="instructionsCard">
+        <h3 style="color: #ffb700; margin-bottom: 10px;">🔑 VALIDACIÓN DE JUGADOR 🔑</h3>
+        
+        <p style="font-size: 0.85rem; line-height: 1.4; margin-bottom: 15px;">
+            Para participar debes estar registrado en la base de datos de <strong>Tex Fashion</strong> tras haber invitado a 4 referidos.
+        </p>
+
+        <button class="btn-comprobante" onclick="abrirFormularioComprobante()">
+            📋 Registrarme y Enviar Comprobante
+        </button>
+
+        <div style="margin-top: 25px; border-top: 1px dashed #ffb700; padding-top: 15px;">
+            <label style="font-size: 0.85rem; font-weight: 700; color: #ffb700; display: block;">INGRESA TU USUARIO REGISTRADO:</label>
+            <input type="text" id="inputUsuario" class="pin-input" placeholder="@tu_usuario" autocomplete="off">
+            <button id="btnVerificar" class="btn-next" onclick="verificarUsuarioEnBaseDatos()">
+                VERIFICAR Y JUGAR ➔
+            </button>
+            <p class="error-msg" id="errorMsg"></p>
+        </div>
+    </div>
+
+    <!-- SECCIÓN DE CAJAS (7 CAJAS) -->
+    <div class="game-section" id="gameSection">
+        <p style="margin-bottom: 15px; font-weight: 700;">¡Selecciona 1 de las 7 cajas para descubrir tu premio!</p>
+        
+        <div class="grid-container" id="gridCajas">
+            <div class="box" onclick="seleccionarCaja(0)">📦</div>
+            <div class="box" onclick="seleccionarCaja(1)">📦</div>
+            <div class="box" onclick="seleccionarCaja(2)">📦</div>
+            <div class="box" onclick="seleccionarCaja(3)">📦</div>
+            <div class="box" onclick="seleccionarCaja(4)">📦</div>
+            <div class="box" onclick="seleccionarCaja(5)">📦</div>
+            <div class="box" onclick="seleccionarCaja(6)">📦</div>
+        </div>
+    </div>
+
+    <!-- MODAL -->
+    <div class="modal" id="modal">
+        <div class="modal-content" id="modalContent"></div>
+    </div>
+
+    <script>
+        const URL_BASE_DATOS = "https://script.google.com/macros/s/AKfycbxmE6d7xzWFGhzKOqvnxqbOlSSeiIDOAPCu70OGh9bgw7L5h0xVH7wWL4xf7be_j1M/exec";
+
+        let usuarioActual = "";
+        let juegoActivo = false;
+        let cajaSeleccionada = null;
+
+        const PREMIOS_BASE = [
+            { 
+                titulo: "¡LO LOGRASTE!", 
+                texto: "Agenda + Estuche Esfero y Portaminas", 
+                imagenes: [
+                    "imagenes/Agenda.png",
+                    "imagenes/caja esfero.png"
+                ],
+                emoji: "🥳"
+            },
+            { 
+                titulo: "¡LO LOGRASTE!", 
+                texto: "Pocillo + Caramañola", 
+                imagenes: [
+                    "imagenes/mug.png",
+                    "imagenes/caramañola.png"
+                ],
+                emoji: "🎉"
+            },
+            { 
+                titulo: "¡LO LOGRASTE!", 
+                texto: "Chaqueta Rompevientos", 
+                imagenes: [
+                    "imagenes/chaqueta.png"
+                ],
+                emoji: "🏆"
+            },
+            { 
+                titulo: "¡LO LOGRASTE!", 
+                texto: "Llavero + Esfero", 
+                imagenes: [
+                    "imagenes/llavero y esfero.png"
+                ],
+                emoji: "⭐"
+            },
+            { 
+                titulo: "¡LO LOGRASTE!", 
+                texto: "Esfero + Llavero", 
+                imagenes: [
+                    "imagenes/llavero y esfero.png"
+                ],
+                emoji: "🤩"
+            },
+            { 
+                titulo: "¡LO LOGRASTE!", 
+                texto: "Esfero & Llavero", 
+                imagenes: [
+                    "imagenes/llavero y esfero.png"
+                ],
+                emoji: "👑"
+            },
+            { 
+                titulo: "¡LO LOGRASTE!", 
+                texto: "Pad Mouse + Esfero", 
+                imagenes: [
+                    "imagenes/pad mouse.png",
+                    "imagenes/juego de esferos.png"
+                ],
+                emoji: "🎊"
+            }
+        ];
+
+        async function verificarUsuarioEnBaseDatos() {
+            const inputVal = document.getElementById('inputUsuario').value.trim().toLowerCase();
+            const errorMsg = document.getElementById('errorMsg');
+            const btnVerificar = document.getElementById('btnVerificar');
+
+            if (!inputVal) {
+                mostrarError("⚠️ Ingresa un usuario válido.");
+                return;
+            }
+
+            btnVerificar.innerText = "VERIFICANDO...";
+            btnVerificar.disabled = true;
+
+            try {
+                const response = await fetch(`${URL_BASE_DATOS}?action=check&usuario=${encodeURIComponent(inputVal)}`);
+                const result = await response.json();
+
+                btnVerificar.innerText = "VERIFICAR Y JUGAR ➔";
+                btnVerificar.disabled = false;
+
+                if (result.status === "not_registered") {
+                    mostrarError("❌ Este usuario NO está registrado. Completa el formulario de comprobante primero.");
+                } else if (result.status === "already_played") {
+                    mostrarError("🚫 Este usuario YA JUGÓ anteriormente y consumió su única oportunidad.");
+                } else if (result.status === "allowed") {
+                    usuarioActual = inputVal;
+                    errorMsg.style.display = 'none';
+                    document.getElementById('instructionsCard').style.display = 'none';
+                    document.getElementById('gameSection').style.display = 'flex';
+                    juegoActivo = true;
+                }
+            } catch (err) {
+                btnVerificar.innerText = "VERIFICAR Y JUGAR ➔";
+                btnVerificar.disabled = false;
+                mostrarError("⚠️ Error de conexión con la base de datos. Intenta nuevamente.");
+            }
+        }
+
+        function mostrarError(texto) {
+            const errorMsg = document.getElementById('errorMsg');
+            errorMsg.innerText = texto;
+            errorMsg.style.display = 'block';
+        }
+
+        function abrirFormularioComprobante() {
+            const modal = document.getElementById('modal');
+            const modalContent = document.getElementById('modalContent');
+
+            modalContent.innerHTML = `
+                <h2>📋 Comprobante de Referidos</h2>
+                <p style="font-size: 0.85rem; color: #4a5568; margin-bottom: 15px;">Completa tus datos para registrarte en el sistema.</p>
+                
+                <form onsubmit="registrarUsuario(event)">
+                    <div class="form-group">
+                        <label>Tu Usuario Principal (Instagram / TikTok):</label>
+                        <input type="text" id="regUsuario" class="form-input" required placeholder="@tu_usuario">
+                    </div>
+                    <div class="form-group">
+                        <label>Nombre Completo:</label>
+                        <input type="text" id="regNombre" class="form-input" required placeholder="Tu nombre">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Los 4 Usuarios Referidos:</label>
+                        <div class="referrals-grid">
+                            <input type="text" class="form-input ref-input" required placeholder="1. @usuario1">
+                            <input type="text" class="form-input ref-input" required placeholder="2. @usuario2">
+                            <input type="text" class="form-input ref-input" required placeholder="3. @usuario3">
+                            <input type="text" class="form-input ref-input" required placeholder="4. @usuario4">
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 15px;">
+                        <button type="submit" class="btn-modal" id="btnEnviarReg">Enviar Registro</button>
+                        <button type="button" class="btn-modal" style="background:#4a5568" onclick="cerrarModal()">Cancelar</button>
+                    </div>
+                </form>
+            `;
+            modal.style.display = 'flex';
+        }
+
+        async function registrarUsuario(e) {
+            e.preventDefault();
+            const btnEnviar = document.getElementById('btnEnviarReg');
+            btnEnviar.innerText = "Guardando...";
+            btnEnviar.disabled = true;
+
+            const usuario = document.getElementById('regUsuario').value.trim().toLowerCase();
+            const nombre = document.getElementById('regNombre').value.trim();
+            const refs = Array.from(document.querySelectorAll('.ref-input')).map(i => i.value.trim()).join(", ");
+
+            try {
+                const response = await fetch(URL_BASE_DATOS, {
+                    method: 'POST',
+                    body: JSON.stringify({ usuario: usuario, nombre: nombre, referidos: refs })
+                });
+                const res = await response.json();
+
+                if (res.status === "already_exists") {
+                    alert("El usuario ya existe en nuestro registro.");
+                } else {
+                    alert("¡Registro exitoso! Ya puedes ingresar tu usuario para jugar.");
+                    cerrarModal();
+                    document.getElementById('inputUsuario').value = usuario;
+                }
+            } catch (err) {
+                alert("Error al guardar el registro. Intenta de nuevo.");
+            }
+        }
+
+        function seleccionarCaja(index) {
+            if (!juegoActivo) return;
+            cajaSeleccionada = index;
+
+            const modal = document.getElementById('modal');
+            const modalContent = document.getElementById('modalContent');
+
+            modalContent.innerHTML = `
+                <h2>¿Abrir esta caja?</h2>
+                <p style="font-size: 0.9rem; color: #4a5568; margin-top: 5px;">Esta acción marcará tu única oportunidad en el sistema.</p>
+                <div style="font-size: 5rem; margin: 15px 0;" class="floating-emoji">📦</div>
+                <br>
+                <button class="btn-modal" onclick="confirmarYJugar()">¡Sí, abrir!</button>
+                <button class="btn-modal" style="background:#4a5568" onclick="cerrarModal()">Elegir otra</button>
+            `;
+            modal.style.display = 'flex';
+        }
+
+        async function confirmarYJugar() {
+            juegoActivo = false;
+            const modalContent = document.getElementById('modalContent');
+            modalContent.innerHTML = `<h2>Abriendo caja... 🎁</h2>`;
+
+            try {
+                await fetch(`${URL_BASE_DATOS}?action=play&usuario=${encodeURIComponent(usuarioActual)}`);
+
+                const premio = PREMIOS_BASE[Math.floor(Math.random() * PREMIOS_BASE.length)];
+
+                const imagenesHTML = premio.imagenes.map(imgSrc => `
+                    <div class="prize-item">
+                        <img src="${imgSrc}" alt="Producto Premio" class="prize-img">
+                    </div>
+                `).join('');
+
+                modalContent.innerHTML = `
+                    <div class="result-container">
+                        <div class="sunburst-bg"></div>
+
+                        <div class="title-anim">
+                            <span class="floating-emoji">${premio.emoji}</span>
+                            <span>${premio.titulo}</span>
+                            <span class="floating-emoji">${premio.emoji}</span>
+                        </div>
+                        
+                        <div class="prize-images-container">
+                            ${imagenesHTML}
+                        </div>
+
+                        <p class="prize-text">
+                            ¡Ganaste: ${premio.texto}!
+                        </p>
+
+                        <br>
+                        <button class="btn-modal" onclick='pantallaReclamoPremio(${JSON.stringify(premio)})'>
+                            🎁 RECLAMAR MI PREMIO ➔
+                        </button>
+                    </div>
+                `;
+            } catch (err) {
+                alert("Ocurrió un error al procesar el intento.");
+            }
+        }
+
+        function pantallaReclamoPremio(premio) {
+            const modalContent = document.getElementById('modalContent');
+
+            const mensajeTexto = `¡Hola Tex Fashion! Gané el premio de la Caja Misteriosa: *${premio.texto}* con mi usuario *${usuarioActual}*. ¡Quiero reclamarlo!`;
+            const mensajeEncoded = encodeURIComponent(mensajeTexto);
+
+            modalContent.innerHTML = `
+                <div class="result-container">
+                    <h2 style="color: #002b7f; font-size: 1.5rem; margin-bottom: 10px;">📲 ¡RECLAMA TU PREMIO!</h2>
+
+                    <!-- RECUADRO CON ANIMACIÓN DESTELLANTE SOLO CON EL TEXTO DEL PREMIO -->
+                    <div class="animated-prize-box">
+                        <p class="animated-prize-title">🎁 ${premio.texto}</p>
+                    </div>
+
+                    <p style="font-size: 0.85rem; color: #4a5568; line-height: 1.4; margin-bottom: 15px;">
+                        Selecciona tu red social favorita para enviar un mensaje a nuestro equipo y coordinar la entrega de tu premio:
+                    </p>
+
+                    <div class="social-claim-grid">
+                        <a href="https://www.instagram.com/texfashiondotaciones" target="_blank" class="btn-social-claim instagram">
+                            <i class="fa-brands fa-instagram"></i> Reclamar por Instagram
+                        </a>
+                        <a href="https://www.tiktok.com/@tex_fashion" target="_blank" class="btn-social-claim tiktok">
+                            <i class="fa-brands fa-tiktok"></i> Reclamar por TikTok
+                        </a>
+                        <a href="https://wa.me/?text=${mensajeEncoded}" target="_blank" class="btn-social-claim whatsapp">
+                            <i class="fa-brands fa-whatsapp"></i> Reclamar por WhatsApp
+                        </a>
+                    </div>
+
+                    <br>
+                    <button class="btn-modal" style="background:#4a5568; border-color:#cbd5e0;" onclick="location.reload()">
+                        Cerrar y Finalizar
+                    </button>
+                </div>
+            `;
+        }
+
+        function cerrarModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
